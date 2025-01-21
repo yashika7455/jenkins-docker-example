@@ -6,7 +6,7 @@ pipeline {
   }
   environment {
     DOCKER_IMAGE = 'yashika7455/jenkins-docker-example:latest'
-    DOCKER_REGISTRY_CREDENTIALS = 'dockerhub'
+    DOCKER_REGISTRY_CREDENTIALS = 'dockerhub'  // This should match the ID in your Jenkins credentials
   }
   stages {
     stage("Cleanup Workspace") {
@@ -33,7 +33,8 @@ pipeline {
       steps {
         script {
           withDockerRegistry([credentialsId: "${DOCKER_REGISTRY_CREDENTIALS}", url: 'https://index.docker.io/v1/']) {
-            sh "docker login -u ${env.DOCKERHUB_USER} -p ${env.DOCKERHUB_PASS}"
+            // Ensure proper login before pushing
+            sh "docker login -u \$(docker secret get ${DOCKER_REGISTRY_CREDENTIALS} | cut -d':' -f1) -p \$(docker secret get ${DOCKER_REGISTRY_CREDENTIALS} | cut -d':' -f2)"
             sh "docker build -t ${DOCKER_IMAGE} ."
             sh "docker push ${DOCKER_IMAGE}"
           }

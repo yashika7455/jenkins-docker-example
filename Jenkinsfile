@@ -33,6 +33,7 @@ pipeline {
       steps {
         script {
           withDockerRegistry([credentialsId: "${DOCKER_REGISTRY_CREDENTIALS}", url: 'https://index.docker.io/v1/']) {
+            sh "docker login -u ${env.DOCKERHUB_USER} -p ${env.DOCKERHUB_PASS}"
             sh "docker build -t ${DOCKER_IMAGE} ."
             sh "docker push ${DOCKER_IMAGE}"
           }

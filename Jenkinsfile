@@ -32,10 +32,11 @@ pipeline {
     stage("Build and Push Docker Image") {
       steps {
         script {
+          // Remove manual docker login, use the withDockerRegistry block for authentication
           withDockerRegistry([credentialsId: "${DOCKER_REGISTRY_CREDENTIALS}", url: 'https://index.docker.io/v1/']) {
-            // Use the credentials directly to login without using docker secret
-            sh "docker login -u \$DOCKER_USERNAME -p \$DOCKER_PASSWORD"
+            // Build the Docker image
             sh "docker build -t ${DOCKER_IMAGE} ."
+            // Push the Docker image to Docker Hub
             sh "docker push ${DOCKER_IMAGE}"
           }
         }
